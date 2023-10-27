@@ -5,13 +5,17 @@ namespace dxsx.Core.Settings
 {
   public class GraphicSettings : Settings
   {
-    enum Resolutions
-    {
-    }
+    GraphicsDeviceManager graphics;
+    ushort[] widths = new ushort[] { 3840, 2560, 2560, 1920, 1366, 1280, 1280 };
+    ushort[] heights = new ushort[] { 2160, 1440, 1080, 1080, 768, 1024, 720 };
 
-    public override void applySettings()
+    void changeResolution(byte newResolution)
     {
-
+      if (newResolution >= 0 && newResolution < widths.Length) {
+        graphics.PreferredBackBufferWidth = widths[newResolution];
+        graphics.PreferredBackBufferHeight = heights[newResolution];
+        graphics.ApplyChanges();
+      }
     }
   }
 }

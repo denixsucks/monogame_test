@@ -1,25 +1,23 @@
-﻿using System.ComponentModel;
-using System.Diagnostics;
-using dxsx.Core.PostProcessing;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace dxsx.Core
 {
   public class MainGame : Game
   {
-    GraphicsDeviceManager graphicsDeviceManager;
+    GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
     SpriteFont font;
     Camera mainCamera;
     Debug.FrameCounter frameCounter;
+    ImGuiNET.ImGuiRenderer imGuiRenderer;
 
     public MainGame()
     {
-      graphicsDeviceManager = new GraphicsDeviceManager(this);
-      graphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
-      graphicsDeviceManager.IsFullScreen = false;
+      graphics = new GraphicsDeviceManager(this) {
+        SynchronizeWithVerticalRetrace = true,
+        IsFullScreen = false
+      };
       IsFixedTimeStep = false;
       Content.RootDirectory = "Content";
       IsMouseVisible = true;
@@ -27,11 +25,19 @@ namespace dxsx.Core
 
     protected override void Initialize()
     {
-      // TODO: Add your initialization logic here
-      mainCamera = new Camera();
-      Camera.CameraSettings cameraSettings = new Camera.CameraSettings(60f, 1f, 1000f);
       frameCounter = new Debug.FrameCounter();
-      mainCamera.initializeCamera(cameraSettings, GraphicsDevice);
+
+      {
+        imGuiRenderer = new ImGuiNET.ImGuiRenderer(this);
+        imGuiRenderer.RebuildFontAtlas();
+      }
+
+      // will move to Scene class
+      {
+        mainCamera = new Camera();
+        Camera.CameraSettings cameraSettings = new Camera.CameraSettings(60f, 1f, 1000f);
+        mainCamera.initializeCamera(cameraSettings, GraphicsDevice);
+      }
       base.Initialize();
     }
 
@@ -39,7 +45,11 @@ namespace dxsx.Core
     {
       spriteBatch = new SpriteBatch(GraphicsDevice);
       font = Content.Load<SpriteFont>("DebugFont");
-      // TODO: use this.Content to load your game content here
+    }
+
+    protected override void UnloadContent()
+    {
+      base.UnloadContent();
     }
 
     protected override void Update(GameTime gameTime)
@@ -51,10 +61,8 @@ namespace dxsx.Core
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.White);
-      // GraphicsDevice.SetVertexBuffer(vertexBuffer);
-      RasterizerState rasterizerState = new RasterizerState();
-      rasterizerState.CullMode = CullMode.None;
-      GraphicsDevice.RasterizerState = rasterizerState;
+
+      // Rendering Sprite Batch
       {
         spriteBatch.Begin();
         var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -63,6 +71,17 @@ namespace dxsx.Core
         spriteBatch.DrawString(font, fps, new Vector2(1, 1), Color.Black);
         spriteBatch.End();
       }
+
+      // Rendering ImGui
+      {
+        var oldSamplerState = GraphicsDevice.SamplerStates[0];
+        GraphicsDevice.SamplerStates[0] = new SamplerState();
+        imGuiRenderer.BeforeLayout(gameTime);
+        ImGuiNET.ImGui.ShowDemoWindow();
+        imGuiRenderer.AfterLayout();
+        GraphicsDevice.SamplerStates[0] = oldSamplerState;
+      }
+
       base.Draw(gameTime);
     }
   }
