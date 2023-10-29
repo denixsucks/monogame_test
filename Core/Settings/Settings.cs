@@ -1,4 +1,4 @@
-namespace dxsx.Core.Settings
+namespace dxsx
 {
   public class Settings
   {

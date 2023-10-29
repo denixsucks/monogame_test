@@ -1,37 +1,58 @@
-using System.Collections.Generic;
+/****************************************************************************/
+// FrameCounter.cs
+/****************************************************************************/
+// This file is part of:
+// SignsOfHeaven
+/****************************************************************************/
+/* Copyright (c) 2023-PRESENT, Deniz Eryilmaz                               */
+/* All Rights Reserved.                                                     */
+/*                                                                          */
+/* THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,          */
+/* EXPRESS OR IMPLIED, IN NO EVENT WILL THE AUTHOR(S) BE HELD LIABLE FOR    */
+/* ANY DAMAGES ARISING FROM THE USE OR DISTRIBUTION OF THIS SOFTWARE        */
+/*                                                                          */
+/* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
+/****************************************************************************/
+
 using System.Linq;
+using System.Collections.Generic;
 
-namespace dxsx.Core.Debug
+namespace dxsx {
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+public class FrameCounter
 {
-  public class FrameCounter
+  // -------------------------------------------------------------------------
+  public long totalFrames { get; private set; }
+  public float totalSeconds { get; private set; }
+  public float averageFramesPerSecond { get; private set; }
+  public float currentFramesPerSecond { get; private set; }
+
+  // -------------------------------------------------------------------------
+  public const int maximumSamples = 100;
+
+  // -------------------------------------------------------------------------
+  Queue<float> sampleBuffer = new();
+
+  // -------------------------------------------------------------------------
+  public void Update(float deltaTime)
   {
-    public long TotalFrames { get; private set; }
-    public float TotalSeconds { get; private set; }
-    public float AverageFramesPerSecond { get; private set; }
-    public float CurrentFramesPerSecond { get; private set; }
+    currentFramesPerSecond = 1.0f / deltaTime;
 
-    public const int MaximumSamples = 100;
+    sampleBuffer.Enqueue(currentFramesPerSecond);
 
-    private Queue<float> _sampleBuffer = new();
-
-    public void Update(float deltaTime)
-    {
-      CurrentFramesPerSecond = 1.0f / deltaTime;
-
-      _sampleBuffer.Enqueue(CurrentFramesPerSecond);
-
-      if (_sampleBuffer.Count > MaximumSamples)
-      {
-        _sampleBuffer.Dequeue();
-        AverageFramesPerSecond = _sampleBuffer.Average(i => i);
-      }
-      else
-      {
-        AverageFramesPerSecond = CurrentFramesPerSecond;
-      }
-
-      TotalFrames++;
-      TotalSeconds += deltaTime;
+    if (sampleBuffer.Count > maximumSamples) {
+      sampleBuffer.Dequeue();
+      averageFramesPerSecond = sampleBuffer.Average(i => i);
     }
+    else {
+      averageFramesPerSecond = currentFramesPerSecond;
+    }
+
+    totalFrames++;
+    totalSeconds += deltaTime;
   }
 }
+
+} // End of namespace dxsx
+

@@ -1,5 +1,5 @@
 /****************************************************************************/
-// ContentPaths.cs
+// SceneManager.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -14,19 +14,17 @@
 /* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
 /****************************************************************************/
 
+using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public static class Content
+public class SceneManager
 {
-  // -------------------------------------------------------------------------
-  // Fonts
-  public static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont> {
-    {"Font/DebugFont", null},
-  };
+  
 }
 
 } // End of namespace dxsx
