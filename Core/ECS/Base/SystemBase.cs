@@ -1,5 +1,5 @@
 /****************************************************************************/
-// ContentLoader.cs
+// SystemBase.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -14,46 +14,16 @@
 /* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
 /****************************************************************************/
 
-using Microsoft.Xna.Framework.Content;
+using Arch.Core;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public sealed class ContentLoader
+public abstract class SystemBase<T>
 {
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ContentLoader() {}
-
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  public static ContentLoader instance {
-    get {
-      if (_instance == null) _instance = new ContentLoader();
-      return _instance;
-    }
-  }
-
-  // -------------------------------------------------------------------------
-  static ContentLoader _instance = null;
-
-  // -------------------------------------------------------------------------
-  public static void loadContent(ContentManager manager)
-  {
-    loadFonts(manager);
-  }
-
-  // -------------------------------------------------------------------------
-  public static void unloadContent()
-  {
-
-  }
-
-  // -------------------------------------------------------------------------
-  static void loadFonts(ContentManager manager)
-  {
-    foreach(var font in Content.fonts)
-      Content.fonts[font.Key] = manager.Load<SpriteFont>(font.Key);
-  }
+  public required World world;
+  public abstract void update(in T state);
 }
 
 } // End of namespace dxsx

@@ -1,5 +1,5 @@
 /****************************************************************************/
-// FrameCounter.cs
+// ContentPaths.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -14,45 +14,24 @@
 /* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
 /****************************************************************************/
 
-using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public class FrameCounter
+public static class Content
 {
   // -------------------------------------------------------------------------
-  public long totalFrames { get; private set; }
-  public float totalSeconds { get; private set; }
-  public float averageFramesPerSecond { get; private set; }
-  public float currentFramesPerSecond { get; private set; }
+  // Fonts
+  public static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont> {
+    {"Font/DebugFont", null},
+  };
 
-  // -------------------------------------------------------------------------
-  public const int maximumSamples = 100;
-
-  // -------------------------------------------------------------------------
-  Queue<float> sampleBuffer = new();
-
-  // -------------------------------------------------------------------------
-  public void Update(float deltaTime)
-  {
-    currentFramesPerSecond = 1.0f / deltaTime;
-
-    sampleBuffer.Enqueue(currentFramesPerSecond);
-
-    if (sampleBuffer.Count > maximumSamples) {
-      sampleBuffer.Dequeue();
-      averageFramesPerSecond = sampleBuffer.Average(i => i);
-    }
-    else {
-      averageFramesPerSecond = currentFramesPerSecond;
-    }
-
-    totalFrames++;
-    totalSeconds += deltaTime;
-  }
+  // Models
+  public static Dictionary<string, Model> models = new Dictionary<string, Model> {
+    {"Font/DebugFont", null},
+  };
 }
 
 } // End of namespace dxsx
-

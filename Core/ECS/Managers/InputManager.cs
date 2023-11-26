@@ -1,5 +1,5 @@
 /****************************************************************************/
-// ContentPaths.cs
+// InputManager.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -15,18 +15,30 @@
 /****************************************************************************/
 
 using System.Collections.Generic;
+using Arch.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public static class Content
+public class InputManager : SystemBase<GameTime>
 {
   // -------------------------------------------------------------------------
-  // Fonts
-  public static Dictionary<string, SpriteFont> fonts = new Dictionary<string, SpriteFont> {
-    {"Font/DebugFont", null},
+  static Dictionary<Keys, Vector3> keyMappings = new Dictionary<Keys, Vector3> {
+    // { Keys.Left, new Vector3(-0.1f, 0, 0) },
+    // { Keys.Right, new Vector3(0.1f, 0, 0) },
+    // { Keys.Up, new Vector3(0, -0.1f, 0) },
+    // { Keys.Down, new Vector3(0, 0.1f, 0) },
+    // { Keys.OemPlus, new Vector3(0, 0, 0.1f) },
+    // { Keys.OemMinus, new Vector3(0, 0, -0.1f) }
   };
-}
 
+  // -------------------------------------------------------------------------
+  public override void update(in GameTime gameTime)
+  {
+    KeyboardState keyState = Keyboard.GetState();
+  }
+}
 } // End of namespace dxsx

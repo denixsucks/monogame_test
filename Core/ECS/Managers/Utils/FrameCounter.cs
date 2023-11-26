@@ -1,5 +1,5 @@
 /****************************************************************************/
-// InputManager.cs
+// FrameCounter.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -14,51 +14,58 @@
 /* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
 /****************************************************************************/
 
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Graphics;
+using System.Runtime.CompilerServices;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public sealed class InputManager
+public class FrameCounter : SystemBase<GameTime>
 {
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  InputManager() {}
+  // -------------------------------------------------------------------------
+  public long totalFrames { get; private set; }
+  public float totalSeconds { get; private set; }
+  public float averageFramesPerSecond { get; private set; }
+  public float currentFramesPerSecond { get; private set; }
 
-  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  public static InputManager instance {
-    get {
-      if (_instance == null)
-        _instance = new InputManager();
-      return _instance;
+  // -------------------------------------------------------------------------
+  public const int maximumSamples = 100;
+
+  // -------------------------------------------------------------------------
+  Queue<float> sampleBuffer = new();
+
+  // -------------------------------------------------------------------------
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public override void update(in GameTime gameTime)
+  {
+    float deltaTime = (float) gameTime.ElapsedGameTime.TotalMilliseconds;
+    currentFramesPerSecond = 1.0f / deltaTime;
+
+    sampleBuffer.Enqueue(currentFramesPerSecond);
+
+    if (sampleBuffer.Count > maximumSamples) {
+      sampleBuffer.Dequeue();
+      averageFramesPerSecond = sampleBuffer.Average(i => i);
     }
+    else {
+      averageFramesPerSecond = currentFramesPerSecond;
+    }
+
+    totalFrames++;
+    totalSeconds += deltaTime;
   }
 
   // -------------------------------------------------------------------------
-  static InputManager _instance = null;
-  static float movementSpeed = 0.1f;
-
-  // -------------------------------------------------------------------------
-  static Dictionary<Keys, Vector3> keyMappings = new Dictionary<Keys, Vector3> {
-    { Keys.Left, new Vector3(-0.1f, 0, 0) },
-    { Keys.Right, new Vector3(0.1f, 0, 0) },
-    { Keys.Up, new Vector3(0, -0.1f, 0) },
-    { Keys.Down, new Vector3(0, 0.1f, 0) },
-    { Keys.OemPlus, new Vector3(0, 0, 0.1f) },
-    { Keys.OemMinus, new Vector3(0, 0, -0.1f) }
-  };
-
-  // -------------------------------------------------------------------------
-  public static void processInput(Camera camera)
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public void draw(SpriteBatch spriteBatch)
   {
-    KeyboardState keyState = Keyboard.GetState();
-    foreach (var keyMapping in keyMappings) {
-      if (keyState.IsKeyDown(keyMapping.Key)) {
-        Camera.updateCameraPosition(camera, keyMapping.Value * movementSpeed);
-      }
-    }
+    var fps = string.Format("FPS: {0}", averageFramesPerSecond);
+    spriteBatch.DrawString(dxsx.Content.fonts["Font/DebugFont"], fps, new Vector2(1, 1), Color.Black);
   }
 }
 
 } // End of namespace dxsx
+

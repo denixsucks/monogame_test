@@ -1,5 +1,5 @@
 /****************************************************************************/
-// Camera.cs
+// ContentLoader.cs
 /****************************************************************************/
 // This file is part of:
 // SignsOfHeaven
@@ -14,57 +14,53 @@
 /* Deniz Eryilmaz <erylmzdnz@gmail.com>                                     */
 /****************************************************************************/
 
-using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace dxsx {
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public class Camera
+public sealed class ContentLoader
 {
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  public class CameraSettings
-  {
-    public float fieldOfView;
-    public float nearClipPlane;
-    public float farClipPlane;
+  ContentLoader() {}
 
-    public CameraSettings(float fieldOfView, float nearClipPlane, float farClipPlane)
-    {
-      this.fieldOfView = MathHelper.ToRadians(fieldOfView);
-      this.nearClipPlane = nearClipPlane;
-      this.farClipPlane = farClipPlane;
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  public static ContentLoader instance {
+    get {
+      if (_instance == null) _instance = new ContentLoader();
+      return _instance;
     }
   }
 
   // -------------------------------------------------------------------------
-  public Vector3 cameraPosition;
-  public Vector3 cameraTarget;
+  static ContentLoader _instance = null;
 
   // -------------------------------------------------------------------------
-  Matrix projectionMatrix;
-  Matrix viewMatrix;
-  Matrix worldMatrix;
+  public static void loadContent(ContentManager manager)
+  {
+    loadFonts(manager);
+    loadModels(manager);
+  }
 
   // -------------------------------------------------------------------------
-  public void update()
+  public static void unloadContent()
   {
 
   }
 
   // -------------------------------------------------------------------------
-  public void updateCameraPosition(Vector3 delta)
+  public static void loadModels(ContentManager manager)
   {
-    cameraPosition += delta;
-    cameraTarget += delta;
+    foreach(var model in Content.models)
+      Content.models[model.Key] = manager.Load<Model>(model.Key);
   }
 
   // -------------------------------------------------------------------------
-  public void initializeCamera(CameraSettings settings, GraphicsDevice graphicsDevice)
+  static void loadFonts(ContentManager manager)
   {
-    projectionMatrix = Matrix.CreatePerspectiveFieldOfView(settings.fieldOfView, graphicsDevice.DisplayMode.AspectRatio, settings.nearClipPlane, settings.farClipPlane);
-    viewMatrix = Matrix.CreateLookAt(cameraPosition, cameraTarget, Vector3.Up);
-    worldMatrix = Matrix.CreateWorld(cameraTarget, Vector3.Forward, Vector3.Up);
+    foreach(var font in Content.fonts)
+      Content.fonts[font.Key] = manager.Load<SpriteFont>(font.Key);
   }
 }
 

@@ -16,6 +16,8 @@
 
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using Arch.Core;
 
 namespace dxsx {
 
@@ -34,24 +36,39 @@ public class MainGame : Game
     IsMouseVisible = true;
   }
 
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  List<SystemBase<GameTime>> systems = new List<SystemBase<GameTime>>();
+
   // -------------------------------------------------------------------------
   public GraphicsDeviceManager graphics;
   public SpriteBatch spriteBatch;
 
   // -------------------------------------------------------------------------
-  FrameCounter frameCounter;
   ImGuiNET.ImGuiRenderer imGuiRenderer;
+  World world;
 
   // -------------------------------------------------------------------------
   protected override void Initialize()
   {
-    frameCounter = new FrameCounter();
 #if DEBUG
     {
       imGuiRenderer = new ImGuiNET.ImGuiRenderer(this);
       imGuiRenderer.RebuildFontAtlas();
     }
 #endif
+
+    world = World.Create(); // Crates world
+
+    // Adding Systems
+    systems.Add(new InputManager() {world = world});
+    systems.Add(new FrameCounter() {world = world});
+
+    // Creates Entities in world
+    world.Create(
+      new Transform { position = Vector3.Zero, rotation = Vector3.Zero, scale = Vector3.One}
+    );
+
+    var entity = new Entity();
     base.Initialize();
   }
 
@@ -73,6 +90,10 @@ public class MainGame : Game
   // -------------------------------------------------------------------------
   protected override void Update(GameTime gameTime)
   {
+    foreach (var system in systems) {
+      system.update(gameTime);
+    }
+
     base.Update(gameTime);
   }
 
@@ -80,14 +101,13 @@ public class MainGame : Game
   protected override void Draw(GameTime gameTime)
   {
     GraphicsDevice.Clear(Color.White);
+    // Draw Models
+    {
+    }
 
     // Rendering Sprite Batch
     {
       spriteBatch.Begin();
-      var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-      frameCounter.Update(deltaTime);
-      var fps = string.Format("FPS: {0}", frameCounter.averageFramesPerSecond);
-      spriteBatch.DrawString(dxsx.Content.fonts["Font/DebugFont"], fps, new Vector2(1, 1), Color.Black);
       spriteBatch.End();
     }
 
